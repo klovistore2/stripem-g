@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Simple pour test
+  url      = "file:./dev.db"
+}
+
+model Offer {
+  id        String   @id @default(uuid())
+  title     String
+  price     Float
+  sellerId  String
+  createdAt DateTime @default(now())
+
+  purchases Purchase[]
+}
+
+model Purchase {
+  id        String   @id @default(uuid())
+  offerId   String
+  sellerId  String
+  date      DateTime @default(now())
+
+  offer     Offer    @relation(fields: [offerId], references: [id], onDelete: Cascade)
+}
