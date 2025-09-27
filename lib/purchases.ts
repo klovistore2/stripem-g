@@ -1,4 +1,3 @@
-// lib/purchases.ts (optimisé : Prisma gère id/date auto, compact, cohérent avec offer.ts)
 'use server';
 
 import { PrismaClient } from '@prisma/client';
@@ -9,21 +8,28 @@ const prisma = new PrismaClient();
 export interface Purchase {
   id: string;
   offer: Offer;
-  date: string; // ISO pour frontend
+  date: string;
 }
 
 export async function savePurchase(offer: Offer) {
-  const purchase = await prisma.purchase.create({
-    data: {
-      offerId: offer.id,
-      sellerId: offer.sellerId,
-    },
-  });
-  return {
-    ...purchase,
-    date: purchase.date.toISOString(),
-    offer,
-  } as Purchase;
+  console.log('Saving purchase for offer:', offer.id);
+  try {
+    const purchase = await prisma.purchase.create({
+      data: {
+        offerId: offer.id,
+        sellerId: offer.sellerId,
+      },
+    });
+    console.log('Purchase created:', purchase.id);
+    return {
+      ...purchase,
+      date: purchase.date.toISOString(),
+      offer,
+    } as Purchase;
+  } catch (error) {
+    console.error('Error saving purchase:', error);
+    throw error;
+  }
 }
 
 export async function getPurchases(): Promise<Purchase[]> {

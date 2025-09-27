@@ -1,10 +1,9 @@
-// actions/payment.ts
+//actions/payment.ts
 'use server';
 
 import Stripe from 'stripe';
 import { redirect } from 'next/navigation';
 import { getOfferById } from '@/lib/offer';
-import { savePurchase } from '@/lib/purchases';
 import { Offer } from '@/types/offer';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-08-27.basil' });
@@ -41,9 +40,8 @@ export async function createCheckoutSession(formData: FormData) {
         application_fee_amount: Math.floor(offer.price * 100 * 0.1),
         transfer_data: { destination: sellerId },
       },
+      metadata: { offer_id: offerId }, // Pour webhook
     });
-
-    await savePurchase(offer);
   } catch (error) {
     console.error('Erreur lors de la création de la session Stripe:', error);
     redirect(`/checkout?offer_id=${offerId}&seller_id=${sellerId}&error=echec-stripe`);
